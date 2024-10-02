@@ -9,6 +9,23 @@ const electronHandler = {
     sendMessage(channel: Channels, ...args: unknown[]) {
       ipcRenderer.send(channel, ...args);
     },
+    getData: () => {
+      return new Promise((resolve) => {
+        ipcRenderer.once('get-data-reply', (_, arg) => {
+          resolve(arg);
+        });
+      
+        ipcRenderer.send('get-data');
+      });
+    },
+    setData: (arg: any) => {
+      return new Promise((resolve) => {
+        ipcRenderer.once('set-data-reply', (_, arg) => {
+          resolve(arg);
+        });
+        ipcRenderer.send('set-data', arg);
+      });
+    },
     on(channel: Channels, func: (...args: unknown[]) => void) {
       const subscription = (_event: IpcRendererEvent, ...args: unknown[]) =>
         func(...args);
